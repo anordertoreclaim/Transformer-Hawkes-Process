@@ -95,7 +95,7 @@ def type_loss(prediction, types, loss_func):
 
 def time_loss(prediction, event_time):
     """ Time prediction loss. """
-
+    non_pad_mask = get_non_pad_mask(event_time).squeeze(2)[:, 1:]
     prediction.squeeze_(-1)
 
     true = event_time[:, 1:] - event_time[:, :-1]
@@ -103,6 +103,7 @@ def time_loss(prediction, event_time):
 
     # event time gap prediction
     diff = prediction - true
+    diff *= non_pad_mask
     se = torch.sum(diff * diff)
     return se
 

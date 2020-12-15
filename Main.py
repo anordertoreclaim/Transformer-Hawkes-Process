@@ -172,6 +172,7 @@ def main():
     parser.add_argument('-epoch', type=int, default=30)
     parser.add_argument('-batch_size', type=int, default=16)
 
+    parser.add_argument('-attention-type', type=str, default='softmax')
     parser.add_argument('-d_model', type=int, default=64)
     parser.add_argument('-d_rnn', type=int, default=256)
     parser.add_argument('-d_inner_hid', type=int, default=128)
@@ -189,6 +190,8 @@ def main():
 
     opt = parser.parse_args()
 
+    assert(opt.attention_type in ['softmax', 'performer'], 'Invalid attention type.')
+
     # default device is CUDA
     opt.device = torch.device('cuda')
 
@@ -204,6 +207,7 @@ def main():
     """ prepare model """
     model = Transformer(
         num_types=num_types,
+        attention_type=opt.attention_type,
         d_model=opt.d_model,
         d_rnn=opt.d_rnn,
         d_inner=opt.d_inner_hid,

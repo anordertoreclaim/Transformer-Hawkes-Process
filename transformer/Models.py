@@ -40,7 +40,7 @@ class Encoder(nn.Module):
 
     def __init__(
             self,
-            num_types, d_model, d_inner,
+            num_types, attention_type, d_model, d_inner,
             n_layers, n_head, d_k, d_v, dropout):
         super().__init__()
 
@@ -55,7 +55,7 @@ class Encoder(nn.Module):
         self.event_emb = nn.Embedding(num_types + 1, d_model, padding_idx=Constants.PAD)
 
         self.layer_stack = nn.ModuleList([
-            EncoderLayer(d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
+            EncoderLayer(attention_type, d_model, d_inner, n_head, d_k, d_v, dropout=dropout)
             for _ in range(n_layers)])
 
     def temporal_enc(self, time, non_pad_mask):
@@ -134,13 +134,14 @@ class Transformer(nn.Module):
 
     def __init__(
             self,
-            num_types, d_model=256, d_rnn=128, d_inner=1024,
-            n_layers=4, n_head=4, d_k=64, d_v=64, dropout=0.1):
+            num_types, attention_type='softmax', d_model=256, d_rnn=128,
+            d_inner=1024, n_layers=4, n_head=4, d_k=64, d_v=64, dropout=0.1):
         super().__init__()
 
         self.encoder = Encoder(
-            num_types=num_types, d_model=d_model, d_inner=d_inner,
-            n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v, dropout=dropout)
+            num_types=num_types, attention_type=attention_type, d_model=d_model,
+            d_inner=d_inner, n_layers=n_layers, n_head=n_head, d_k=d_k, d_v=d_v,
+            dropout=dropout)
 
         self.num_types = num_types
 
